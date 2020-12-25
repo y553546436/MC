@@ -18,6 +18,17 @@ int n, m, dscore[N], w[N][N], lastuncover[N][N];
 
 int step;
 
+void init() {
+    L.clear();
+    UL.clear();
+    memset(G,0,sizeof G);
+    memset(C,0,sizeof C);
+    memset(_C, 0, sizeof _C);
+    memset(covered, 0, sizeof covered);
+    Csize=Lsize=0;
+    memset(lastuncover,0,sizeof lastuncover);
+}
+
 void addtoC(int u) {
     C[u] = 1; Csize++;
     dscore[u] = -dscore[u];
@@ -213,8 +224,9 @@ void MC(int delta, int maxSteps) {
 }
 
 int main() {
-    freopen("in.txt","r",stdin);
-    scanf("%d%d",&n,&m);
+    //freopen("in.txt","r",stdin);
+    while (~scanf("%d%d",&n,&m)) {
+    init();
     for (int i = 0,u,v; i < m; ++i) {
         scanf("%d%d",&u,&v); u--; v--;
         if (u != v) G[u][v] = G[v][u] = true;
@@ -228,6 +240,7 @@ int main() {
                 G[i][j] = G[j][i] = 1;
             }
         }
-    MC(2, 100000000);
+    MC(2, 100000);
+    }
     return 0;
 }
