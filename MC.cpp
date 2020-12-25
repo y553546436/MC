@@ -147,7 +147,12 @@ void greedy_update() {
         for (int i = 0; i < n; ++i)
             if (G[k][i] && !tmp[i]) f[i]--;
     }
-    memcpy(_C, tmp, sizeof tmp);
+    int cnt1 = 0, cnt2 = 0;
+    for (int i = 0; i < n; ++i) {
+        if (_C[i]) cnt1++;
+        if (tmp[i]) cnt2++;
+    }
+    if (cnt1 > cnt2) memcpy(_C, tmp, sizeof tmp);
 }
 const int maxsize = 500000;
 void MC(int delta, int maxSteps) {
@@ -262,7 +267,9 @@ int main() {
                 G[i][j] = G[j][i] = 1;
             }
         }
-    MC(2, 5 * n);
+    MC(3, 300 * n);
+    //(3, 100 * n) 146
+    //(3, 300 * n) 147
     }
     return 0;
 }
