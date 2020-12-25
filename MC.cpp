@@ -6,9 +6,10 @@
 #include <ctime>
 #include <list>
 using namespace std;
-const int N = 755;
+const int N = 752;
 struct edge {
-    int lastuncover,u,v;
+    int lastuncover;
+	short u,v;
 }; 
 list<edge> L, UL;
 
@@ -53,8 +54,8 @@ void removefromC(int u) {
                 Lsize ++;
                 covered[u][i] = false;
                 lastuncover[u][i] = step;
-                L.push_back((edge){step,u,i});
-                UL.push_back((edge){step,u,i});
+                L.push_back((edge){step,(short)u,(short)i});
+                UL.push_back((edge){step,(short)u,(short)i});
             }
         }
 }
@@ -94,6 +95,7 @@ bool ChooseExchangePair(int &last_add, int &last_remove) {
             break;
         }
     }
+    
     if (p == -1) {
         auto it = UL.begin();
         while(!UL.empty()) {
@@ -147,7 +149,7 @@ void greedy_update() {
     }
     memcpy(_C, tmp, sizeof tmp);
 }
-
+const int maxsize = 500000;
 void MC(int delta, int maxSteps) {
     Csize = 0, Lsize = m;
     srand(19260817);
@@ -157,8 +159,8 @@ void MC(int delta, int maxSteps) {
             if (i!=j && G[i][j]) {
                 ++cnt, w[i][j]=1;
                 if (i < j) {
-                    L.push_back((edge){0,i,j});
-                    UL.push_back((edge){0,i,j});
+                    L.push_back((edge){0,(short)i,(short)j});
+                    UL.push_back((edge){0,(short)i,(short)j});
                 }
             } 
         dscore[i] = cnt;
@@ -179,6 +181,26 @@ void MC(int delta, int maxSteps) {
 
     int last_add = -1, last_remove = -1;
     for (step = 0; step < maxSteps; ++step) {
+    	if(UL.size()>maxsize){
+    		for(auto it=UL.begin();it!=UL.end();){
+    			int u = it->u, v = it->v;
+	            if (covered[u][v] || it->lastuncover != lastuncover[u][v]) {
+	                it = UL.erase(it);
+	                continue;
+	            }
+	            else it++;
+	        }
+	    }
+	    if(L.size()>maxsize){
+	    	for(auto it=L.begin();it!=L.end();){
+    			int u = it->u, v = it->v;
+	            if (covered[u][v] || it->lastuncover != lastuncover[u][v]) {
+	                it = L.erase(it);
+	                continue;
+	            }
+	            else it++;
+	        }
+	    }
         if (!ChooseExchangePair(last_add, last_remove)) {
             for (auto it = L.begin(); it != L.end();) {
                 int u = it->u, v = it->v;
@@ -200,7 +222,7 @@ void MC(int delta, int maxSteps) {
             addtoC(v);
             removefromC(u);
         }
-
+    		
         if (Csize + Lsize < ub) {
             ub = Csize + Lsize;
             greedy_update();
@@ -240,7 +262,7 @@ int main() {
                 G[i][j] = G[j][i] = 1;
             }
         }
-    MC(2, 100000);
+    MC(2, 5 * n);
     }
     return 0;
 }
