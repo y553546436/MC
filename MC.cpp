@@ -73,8 +73,13 @@ void remove_some(int ub, int delta) {
     }
 }
 
+int Rand() {
+    return (rand() << 16) | rand();
+}
+
 bool ChooseExchangePair(int &last_add, int &last_remove) {
     int p = -1, q = -1;
+    int randcnt = 0;
     auto it = L.begin();
     while(it != L.end()) {
         int u = it->u, v = it->v;
@@ -86,10 +91,10 @@ bool ChooseExchangePair(int &last_add, int &last_remove) {
                     int score_u = dscore[i] + dscore[u] + w[i][u];
                     int score_v = dscore[i] + dscore[v] + w[i][v];
                     if (score_u > 0) {
-                        if ((last_add != u || last_remove != i) && (p == -1 || (rand() & 1))) p = i, q = u;
+                        if ((last_add != u || last_remove != i) && Rand()%(++randcnt) == 0) p = i, q = u;
                     }
                     if (score_v > 0) {
-                        if ((last_add != u || last_remove != i) && (p == -1 || (rand() & 1))) p = i, q = v;
+                        if ((last_add != v || last_remove != i) && Rand()%(++randcnt) == 0) p = i, q = v;
                     }
                 }
             break;
@@ -109,10 +114,10 @@ bool ChooseExchangePair(int &last_add, int &last_remove) {
                     int score_u = dscore[i] + dscore[u] + w[i][u];
                     int score_v = dscore[i] + dscore[v] + w[i][v];
                     if (score_u > 0) {
-                        if (p == -1 || (rand() & 1)) p = i, q = u;
+                        if ((last_add != u || last_remove != i) && Rand()%(++randcnt) == 0) p = i, q = u;
                     }
                     if (score_v > 0) {
-                        if (p == -1 || (rand() & 1)) p = i, q = v;
+                        if ((last_add != v || last_remove != i) && Rand()%(++randcnt) == 0) p = i, q = v;
                     }
                 }
             it = UL.erase(it);
@@ -156,6 +161,7 @@ void greedy_update() {
 }
 const int maxsize = 500000;
 void MC(int delta, int maxSteps) {
+    greedy_update();
     Csize = 0, Lsize = m;
     srand(19260817);
     for (int i = 0; i < n; ++i) {
@@ -171,10 +177,10 @@ void MC(int delta, int maxSteps) {
         dscore[i] = cnt;
     }
     for (int i = 0; i < n; ++i) {
-        int k = -1, mx = 0;
+        int k = -1, mx = 0, randcnt = 0;
         for (int j = 0; j < n; ++j)
             if (!C[j] && dscore[j] >= mx) {
-                if (dscore[j] == mx && (rand() & 1)) continue;
+                if (dscore[j] == mx && Rand() % (++randcnt) == 0) continue;
                 mx = dscore[j], k = j;
             }
         if (mx == 0) break;
